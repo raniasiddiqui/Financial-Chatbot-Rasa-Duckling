@@ -85,10 +85,15 @@ def parse_with_duckling(text):
         logging.error(f"Duckling request failed with status code {response.status_code}")
         return None
     
+# def extract_number_from_query(query):
+#     match = re.search(r'last (\d+) transactions', query.lower())
+#     if match:
+#         return int(match.group(1))
+#     return None
 def extract_number_from_query(query):
-    match = re.search(r'last (\d+) transactions', query.lower())
+    match = re.search(r'(last|latest|top) (\d+) transactions', query.lower())
     if match:
-        return int(match.group(1))
+        return int(match.group(2))
     return None
 
 
@@ -342,7 +347,9 @@ def generate_response(user_input, name):
     elif intent == "search_transactions":
         sender_surname = session_data.get("PERSON", name)
         # Check if the query requests the latest X number of transactions
-        if "last" in user_input.lower() and "transactions" in user_input.lower():
+        # if "last" in user_input.lower() and "transactions" in user_input.lower():
+        #     return fetch_transactions_by_name_and_date_expr(sender_surname, user_input)
+        if any(keyword in user_input.lower() for keyword in ["last", "latest", "top"]) and "transactions" in user_input.lower():
             return fetch_transactions_by_name_and_date_expr(sender_surname, user_input)
         elif "all past transactions" in user_input.lower() or "all transactions" in user_input.lower() or "past transaction history" in user_input.lower():
             return fetch_transactions_by_name_and_date_expr(sender_surname, user_input)
