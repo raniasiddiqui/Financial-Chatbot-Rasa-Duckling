@@ -138,6 +138,31 @@ def fetch_transactions_by_name_and_date_expr(sender_surname, query, db_path=r"C:
             return f"Latest {num_transactions} transactions:\n" + "\n".join(transactions)
         else:
             return "No transactions found for the specified criteria."
+    if 'all past transactions' in query.lower() or 'all transactions' in query.lower() or 'past transaction history' in query.lower():
+        # Create a connection to the SQLite database
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+
+        # Define the query to fetch all transactions by name
+        query = '''
+        SELECT transaction_date, amount 
+        FROM transactions
+        WHERE sender_surname = ?
+        ORDER BY transaction_date DESC
+        '''
+
+        # Execute the query with the name parameter
+        cursor.execute(query, (sender_surname,))
+
+        results = cursor.fetchall()
+        conn.close()
+
+        if results:
+            transactions = [f"Date: {result[0]}, Amount: {result[1]:.2f}" for result in results]
+            return f"All past transactions:\n" + "\n".join(transactions)
+        else:
+            return "No transactions found for the specified criteria."
+
 
     # Extract dates from the query
     duckling_entities = parse_with_duckling(query)
@@ -318,6 +343,8 @@ def generate_response(user_input, name):
         sender_surname = session_data.get("PERSON", name)
         # Check if the query requests the latest X number of transactions
         if "last" in user_input.lower() and "transactions" in user_input.lower():
+            return fetch_transactions_by_name_and_date_expr(sender_surname, user_input)
+        elif "all past transactions" in user_input.lower() or "all transactions" in user_input.lower() or "past transaction history" in user_input.lower():
             return fetch_transactions_by_name_and_date_expr(sender_surname, user_input)
         else:
             date_expr = user_input
