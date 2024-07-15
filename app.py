@@ -84,12 +84,7 @@ def parse_with_duckling(text):
     else:
         logging.error(f"Duckling request failed with status code {response.status_code}")
         return None
-    
-# def extract_number_from_query(query):
-#     match = re.search(r'last (\d+) transactions', query.lower())
-#     if match:
-#         return int(match.group(1))
-#     return None
+
 def extract_number_from_query(query):
     match = re.search(r'(last|latest|top) (\d+) transactions', query.lower())
     if match:
@@ -176,6 +171,7 @@ def fetch_transactions_by_name_and_date_expr(sender_surname, query, db_path=r"C:
     
     results = []
     now = datetime.now()
+    start_date, end_date = None, None #new line added 
 
     # Handle common date expressions manually
     if 'last month' in query.lower():
