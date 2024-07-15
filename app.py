@@ -15,6 +15,7 @@ from dateutil.relativedelta import relativedelta
 import sqlite3
 from datetime import datetime
 import requests
+import json
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -83,6 +84,12 @@ def parse_with_duckling(text):
     else:
         logging.error(f"Duckling request failed with status code {response.status_code}")
         return None
+    
+def extract_number_from_query(query):
+    match = re.search(r'last (\d+) transactions', query.lower())
+    if match:
+        return int(match.group(1))
+    return None
 
 
 def extract_entities(text):
@@ -102,14 +109,43 @@ def extract_entities(text):
     
     return entities
 
+
 def fetch_transactions_by_name_and_date_expr(sender_surname, query, db_path=r"C:\Users\Lenovo\Downloads\chatbot_tranc.db"):
+    # Check if the query requests a specific number of latest transactions
+    num_transactions = extract_number_from_query(query)
+    if num_transactions:
+        # Create a connection to the SQLite database
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+
+        # Define the query to fetch the latest X transactions by name
+        query = '''
+        SELECT transaction_date, amount 
+        FROM transactions
+        WHERE sender_surname = ?
+        ORDER BY transaction_date DESC
+        LIMIT ?
+        '''
+
+        # Execute the query with the name and number of transactions parameters
+        cursor.execute(query, (sender_surname, num_transactions))
+
+        results = cursor.fetchall()
+        conn.close()
+
+        if results:
+            transactions = [f"Date: {result[0]}, Amount: {result[1]:.2f}" for result in results]
+            return f"Latest {num_transactions} transactions:\n" + "\n".join(transactions)
+        else:
+            return "No transactions found for the specified criteria."
+
     # Extract dates from the query
     duckling_entities = parse_with_duckling(query)
     if not duckling_entities:
-        return
+        return "No date information found in the query."
+    
     results = []
     now = datetime.now()
-
 
     # Handle common date expressions manually
     if 'last month' in query.lower():
@@ -139,17 +175,22 @@ def fetch_transactions_by_name_and_date_expr(sender_surname, query, db_path=r"C:
     elif 'current year' in query.lower():
         start_date = now.replace(month=1, day=1)
         end_date = now
+    elif 'all past transactions' in query.lower() or 'all transactions' in query.lower() or 'past transaction history' in query.lower():
+        start_date = datetime.min
+        end_date = now
     else:
-        # Use Duckling entities if no common expression is detected
         for entity in duckling_entities:
             if entity['dim'] == 'time':
                 value = entity['value']
-            if value['type'] == 'interval':
-                start_date = datetime.fromisoformat(value['from']['value'].split('T')[0])
-                end_date = datetime.fromisoformat(value['to']['value'].split('T')[0])
-            else:
-                start_date = end_date = datetime.fromisoformat(value['value'].split('T')[0])
-            break
+                if value['type'] == 'interval':
+                    start_date = datetime.fromisoformat(value['from']['value'].split('T')[0])
+                    end_date = datetime.fromisoformat(value['to']['value'].split('T')[0]) if 'to' in value else (start_date.replace(month=start_date.month % 12 + 1, day=1) - timedelta(days=1)) if start_date.month != 12 else start_date.replace(month=12, day=31)
+                else:
+                    # Handle the case where only a month or a specific date is given
+                    date = datetime.fromisoformat(value['value'].split('T')[0])
+                    start_date = date.replace(day=1)
+                    end_date = (date.replace(month=date.month % 12 + 1, day=1) - timedelta(days=1)) if date.month != 12 else date.replace(month=12, day=31)
+                break
 
     if not start_date or not end_date:
         return "Unable to determine date range from the provided query."
@@ -174,13 +215,13 @@ def fetch_transactions_by_name_and_date_expr(sender_surname, query, db_path=r"C:
 
     result = cursor.fetchone()
     conn.close()
+    
     if result:
         count, total_amount = result
         return f"Total number of transactions: {count}, Sum of all transactions: {total_amount:.2f}"
     else:
         return "No transactions found for the specified criteria."
-    print(results)
-    
+ 
 
 
 def fetch_customer_balance(surname):
@@ -250,6 +291,7 @@ def transfer_money(name, receiver_name, amount):
         conn.close()
         return f"Failed to transfer money due to: {str(e)}"
 
+
 def generate_response(user_input, name):
     global session_data
     logging.debug(f"Generating response for user input: {user_input}")
@@ -274,8 +316,12 @@ def generate_response(user_input, name):
             return "Please provide receiver's name and amount to transfer."
     elif intent == "search_transactions":
         sender_surname = session_data.get("PERSON", name)
-        date_expr = user_input  # We assume the date expression is part of the user input
-        return fetch_transactions_by_name_and_date_expr(sender_surname, date_expr)
+        # Check if the query requests the latest X number of transactions
+        if "last" in user_input.lower() and "transactions" in user_input.lower():
+            return fetch_transactions_by_name_and_date_expr(sender_surname, user_input)
+        else:
+            date_expr = user_input
+            return fetch_transactions_by_name_and_date_expr(sender_surname, date_expr)
     elif intent == "check_human":
         return "I am an AI created to assist you with financial inquiries."
     elif intent == 'open_account':
@@ -290,6 +336,7 @@ def generate_response(user_input, name):
         return "You can contact our customer support through the chat feature on our website or by calling our support number."
     else:
         return "Sorry, I don't understand your query."
+
 
 @app.route('/')
 def home():
