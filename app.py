@@ -1,5 +1,5 @@
 import logging
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, session
 from chatbot import classify_intent, extract_entities, fetch_customer_balance, transfer_money
 import sqlite3
 import torch
@@ -22,13 +22,14 @@ logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
+
 # Load spaCy model
 logging.info("Loading spaCy model...")
 nlp = spacy.load("en_core_web_sm")
 
 # Load BERT model and tokenizer
 logging.info("Loading BERT model and tokenizer...")
-model_path = r"C:\Users\Lenovo\Downloads\Model-20240704T051704Z-001\Model"
+model_path = r"C:\Users\Lenovo\Downloads\Model"
 tokenizer = BertTokenizer.from_pretrained(model_path)
 model = BertForSequenceClassification.from_pretrained(model_path)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -41,7 +42,7 @@ df_intents = pd.read_csv(csv_file)
 label_encoder = LabelEncoder()
 df_intents['Intent'] = label_encoder.fit_transform(df_intents['Intent'])
 
-session_data = {}
+# session_data = {}
 
 def classify_intent(query):
     logging.debug(f"Classifying intent for query: {query}")
@@ -93,18 +94,22 @@ def extract_number_from_query(query):
 
 
 def extract_entities(text):
-    # logging.debug(f"Extracting entities from text: {text}")
     doc = nlp(text)
-    entities = {ent.label_: ent.text for ent in doc.ents}
+    entities = {}
+
+    # Convert GPE to PERSON and add to entities dictionary
+    for ent in doc.ents:
+        if ent.label_ == 'GPE' or ent.label_ == 'ORG':
+            entities['PERSON'] = ent.text
+        else:
+            entities[ent.label_] = ent.text
 
     # Use regex to capture names if not recognized by SpaCy
     if "PERSON" not in entities:
-        # Look for patterns like "to [Name]", "Send [Name]", or "pay [Name]"
-        match = re.search(r'\b(?:to|send|pay)\s+([A-Z][a-z]+(?:\s[A-Z][a-z]+)*)\b', text, re.IGNORECASE)
+        # Look for a pattern like "to [Name]"
+        match = re.search(r'\bto\s+([A-Z][a-z]+)\b', text)
         if match:
             entities["PERSON"] = match.group(1)
-    
-    # Print the extracted entities
     print("Extracted entities:", entities)
     
     return entities
@@ -249,7 +254,6 @@ def fetch_transactions_by_name_and_date_expr(sender_surname, query, db_path=r"C:
         return "No transactions found for the specified criteria."
  
 
-
 def fetch_customer_balance(surname):
     logging.debug(f"Fetching customer balance for surname: {surname}")
     conn = sqlite3.connect(r"C:\Users\Lenovo\Downloads\chatbot_tranc.db")
@@ -317,56 +321,127 @@ def transfer_money(name, receiver_name, amount):
         conn.close()
         return f"Failed to transfer money due to: {str(e)}"
 
+session_data = {}
 
 def generate_response(user_input, name):
-    global session_data
-    logging.debug(f"Generating response for user input: {user_input}")
     intent = classify_intent(user_input)
-    entities = extract_entities(user_input)
+    logging.debug(f"Detected intent: {intent}")
 
-    # Update session data with new entities
-    session_data.update(entities)
+    entities = extract_entities(user_input)
+    logging.debug(f"Extracted entities: {entities}")
+
+    # Initialize chat history if not already present
+    if name not in session_data:
+        session_data[name] = {'chat_history': [], 'context': {}}
+
+    # Append user query to chat history
+    session_data[name]['chat_history'].append({'user': user_input, 'intent': intent, 'entities': entities})
+    print(session_data)
+
+    response = None  # Initialize response as None
 
     if intent == "check_balance":
-        return fetch_customer_balance(name)
+        response = fetch_customer_balance(name)
     elif intent == "transfer_money":
-        amount = session_data.get("MONEY", None)
-        receiver_name = session_data.get("PERSON", None)
+        missing_entities = []
+        if 'MONEY' not in entities and 'amount' not in session_data[name]['context']:
+            missing_entities.append('MONEY')
+        if 'PERSON' not in entities and 'receiver_name' not in session_data[name]['context']:
+            missing_entities.append('PERSON')
 
-        if amount and receiver_name:
-            # Clear the session data after use
-            session_data.clear()
-            amount = float(amount.replace('$', '').replace(',', ''))
-            return transfer_money(name, receiver_name, amount)
+        print('missing_entities',missing_entities)
+
+        if not missing_entities:
+            amount = float(entities['MONEY'].replace('$', '').replace(',', ''))
+            receiver_name = entities['PERSON']
+            # Clear the session context for this conversation
+            session_data[name]['context'] = {}
+            response = transfer_money(name, receiver_name, amount)
         else:
-            return "Please provide receiver's name and amount to transfer."
+            if 'MONEY' not in entities and 'amount' not in session_data[name]['context']:
+                session_data[name]['context']['missing'] = 'MONEY'
+                if 'PERSON' in entities:
+                    session_data[name]['context']['receiver_name'] = entities['PERSON']
+                response = "How much money do you want to transfer?"
+            elif 'PERSON' not in entities and 'receiver_name' not in session_data[name]['context']:
+                session_data[name]['context']['missing'] = 'PERSON'
+                response = "To whom do you want to transfer money?"
+                if 'MONEY' in entities:
+                    session_data[name]['context']['amount'] = float(entities['MONEY'].replace('$', '').replace(',', ''))
+                response = "To whom do you want to transfer money?"
+
+
+    elif intent == "inform" or intent == "affirm":
+        missing_entity = session_data[name]['context'].get('missing')
+        
+        if missing_entity == 'MONEY' and 'MONEY' in entities:
+            session_data[name]['context']['missing'] = None
+            session_data[name]['context']['amount'] = float(entities['MONEY'].replace('$', '').replace(',', ''))
+            if 'receiver_name' in session_data[name]['context']:
+                receiver_name = session_data[name]['context'].pop('receiver_name')
+                amount = session_data[name]['context'].pop('amount')
+                response = transfer_money(name, receiver_name, amount)
+            else:
+                response = "To whom do you want to transfer money?"
+                
+        elif missing_entity == 'PERSON' and 'PERSON' in entities:
+            session_data[name]['context']['missing'] = None
+            session_data[name]['context']['receiver_name'] = entities['PERSON']
+            if 'amount' in session_data[name]['context']:
+                receiver_name = session_data[name]['context'].pop('receiver_name')
+                amount = session_data[name]['context'].pop('amount')
+                response = transfer_money(name, receiver_name, amount)
+            else:
+                response = "How much money do you want to transfer?"
+                
+        elif 'PERSON' in entities and 'MONEY' in entities:
+            amount = float(entities['MONEY'].replace('$', '').replace(',', ''))
+            receiver_name = entities['PERSON']
+            response = transfer_money(name, receiver_name, amount)
+        
+        elif 'PERSON' in entities and 'amount' in session_data[name]['context']:
+            receiver_name = entities['PERSON']
+            amount = session_data[name]['context'].pop('amount')
+            response = transfer_money(name, receiver_name, amount)
+        
+        elif 'MONEY' in entities and 'receiver_name' in session_data[name]['context']:
+            amount = float(entities['MONEY'].replace('$', '').replace(',', ''))
+            receiver_name = session_data[name]['context'].pop('receiver_name')
+            response = transfer_money(name, receiver_name, amount)
+        
+        else:
+            response = "Sorry, I don't understand your query."
+
+
     elif intent == "search_transactions":
         sender_surname = session_data.get("PERSON", name)
-        # Check if the query requests the latest X number of transactions
-        # if "last" in user_input.lower() and "transactions" in user_input.lower():
-        #     return fetch_transactions_by_name_and_date_expr(sender_surname, user_input)
         if any(keyword in user_input.lower() for keyword in ["last", "latest", "top"]) and "transactions" in user_input.lower():
-            return fetch_transactions_by_name_and_date_expr(sender_surname, user_input)
+            response = fetch_transactions_by_name_and_date_expr(sender_surname, user_input)
         elif "all past transactions" in user_input.lower() or "all transactions" in user_input.lower() or "past transaction history" in user_input.lower():
-            return fetch_transactions_by_name_and_date_expr(sender_surname, user_input)
+            response = fetch_transactions_by_name_and_date_expr(sender_surname, user_input)
         else:
             date_expr = user_input
-            return fetch_transactions_by_name_and_date_expr(sender_surname, date_expr)
+            response = fetch_transactions_by_name_and_date_expr(sender_surname, date_expr)
     elif intent == "check_human":
-        return "I am an AI created to assist you with financial inquiries."
+        response = "I am an AI created to assist you with financial inquiries."
     elif intent == 'open_account':
-        return "To open a new account, please visit our website or nearest branch with your identification documents."
+        response = "To open a new account, please visit our website or nearest branch with your identification documents."
     elif intent == 'close_account':
-        return "To close your account, please visit our nearest branch or contact our customer support."
+        response = "To close your account, please visit our nearest branch or contact our customer support."
     elif intent == "loan_inquiry":
-        return "You can inquire about loans and their eligibility criteria on our website or by visiting our branch."
+        response = "You can inquire about loans and their eligibility criteria on our website or by visiting our branch."
     elif intent == 'credit_card_application':
-        return "You can apply for a credit card through our website or by visiting our nearest branch."
+        response = "You can apply for a credit card through our website or by visiting our nearest branch."
     elif intent == 'contact_support':
-        return "You can contact our customer support through the chat feature on our website or by calling our support number."
-    else:
-        return "Sorry, I don't understand your query."
+        response = "You can contact our customer support through the chat feature on our website or by calling our support number."
 
+    # Check if response was set, otherwise return default response
+    if response is None:
+        response = "I'm sorry, I didn't understand your request. Can you please rephrase?"
+        logging.debug("Default response used.")
+
+    logging.debug(f"Final response: {response}")
+    return response
 
 @app.route('/')
 def home():
@@ -384,4 +459,7 @@ def chat():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
 
