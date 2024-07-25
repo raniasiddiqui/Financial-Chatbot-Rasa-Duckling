@@ -29,7 +29,7 @@ nlp = spacy.load("en_core_web_sm")
 
 # Load BERT model and tokenizer
 logging.info("Loading BERT model and tokenizer...")
-model_path = r"C:\Users\Lenovo\Downloads\Model"
+model_path = r"C:\Users\Lenovo\Downloads\modellll-20240725T072010Z-001\modellll"
 tokenizer = BertTokenizer.from_pretrained(model_path)
 model = BertForSequenceClassification.from_pretrained(model_path)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -37,8 +37,8 @@ model.to(device)
 
 # Load label encoder
 logging.info("Loading label encoder...")
-csv_file = r"C:\Users\Lenovo\Downloads\intents_and_exampless.csv"
-df_intents = pd.read_csv(csv_file)
+csv_file = r"C:\Users\Lenovo\Downloads\updated_intentsandexamples.csv"
+df_intents = pd.read_csv(csv_file, encoding='ISO-8859-1')
 label_encoder = LabelEncoder()
 df_intents['Intent'] = label_encoder.fit_transform(df_intents['Intent'])
 
@@ -267,6 +267,44 @@ def fetch_customer_balance(surname):
         balance_message = "No balance data available."
     logging.debug(balance_message)
     return balance_message
+    
+
+def fetch_reward_points(surname):
+    logging.debug(f"Fetching reward points for surname: {surname}")
+    conn = sqlite3.connect(r"C:\Users\Lenovo\Downloads\chatbot_tranc.db")
+    c = conn.cursor()
+    c.execute('SELECT rewards_point FROM customers WHERE Surname = ?', (surname,))
+    result = c.fetchone()
+    conn.close()
+    if result:
+        reward_point_message = f"Your current reward points are {result[0]}."
+    else:
+        reward_point_message = "No reward points available."
+    logging.debug(reward_point_message)
+    return reward_point_message
+
+def fetching_branch_location():
+    logging.debug("Fetching branch locations open on weekends")
+    conn = sqlite3.connect(r"C:\Users\Lenovo\Downloads\chatbot_tranc.db")
+    cursor = conn.cursor()
+    
+    # Define the query to fetch branches open on weekends
+    query = '''
+    SELECT name, address 
+    FROM branch_location
+    WHERE is_weekend_open = 1
+    '''
+    
+    cursor.execute(query)
+    results = cursor.fetchall()
+    conn.close()
+    
+    if results:
+        branches = [f"Name: {row[0]}, Address: {row[1]}" for row in results]
+        return f"Branches open on weekends:\n" + "\n".join(branches)
+    else:
+        return "No branches are open on weekends."
+
 
 def transfer_money(name, receiver_name, amount):
     logging.debug(f"Transferring money from {name} to {receiver_name} amount: {amount}")
@@ -342,6 +380,15 @@ def generate_response(user_input, name):
 
     if intent == "check_balance":
         response = fetch_customer_balance(name)
+    elif intent == "check_reward_point":
+        response = fetch_reward_points(name)
+    elif intent == "branch_location":
+        if any(day in user_input.lower() for day in ["monday", "tuesday", "wednesday", "thursday", "friday", "weekdays"]):
+            response = "Yes, all branches are open on weekdays."
+        elif "sunday" in user_input.lower():
+            response = "No, all branches are closed on sundays."
+        else:
+            response = fetching_branch_location()
     elif intent == "transfer_money":
         missing_entities = []
         if 'MONEY' not in entities and 'amount' not in session_data[name]['context']:
@@ -459,6 +506,7 @@ def chat():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 
 
