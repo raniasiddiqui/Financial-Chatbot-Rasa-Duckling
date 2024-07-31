@@ -400,6 +400,8 @@ def generate_response(user_input, name):
     print(session_data)
 
     response = None  # Initialize response as None
+    tags = ""  
+    step = ""
 
     def restore_context():
         missing_entity = session_data[name]['context'].get('missing')
@@ -427,6 +429,10 @@ def generate_response(user_input, name):
         response = f"{balance_response} {context_response}".strip()
         restore_interrupted_context()
         print(restore_interrupted_context)
+        # tags['function'] = 'account_balance'
+        tags = 'account balance'
+        step = '1'
+
     elif intent == "check_reward_point":
         save_interrupted_context()
         reward_response = fetch_reward_points(name)
@@ -435,11 +441,17 @@ def generate_response(user_input, name):
         response = f"{reward_response} {context_response}".strip()
         restore_interrupted_context()
         print(restore_interrupted_context)
+        tags = 'reward_points'
+        step = '1'
+
     elif intent == "branch_location":
         if any(day in user_input.lower() for day in ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]):
             response = fetching_branch_location(user_input)
         else:
             response = "Please specify a day of the week."
+        tags = 'branch_location'
+        step = '1'
+
     elif intent == "transfer_money":
         missing_entities = []
         if 'MONEY' not in entities and 'amount' not in session_data[name]['context']:
@@ -453,17 +465,23 @@ def generate_response(user_input, name):
             account_number = transfer_money(name, receiver_name, amount)
             session_data[name]['context'] = {'amount': amount, 'receiver_name': receiver_name, 'step': 'confirm_transfer'}
             response = f"Please confirm the transfer to {receiver_name} with account number {account_number}. Type 'yes' to confirm or 'no' to cancel."
+            tags = 'transfer_money'
+            step = 'confirm_transfer'
         else:
             if 'MONEY' not in entities and 'amount' not in session_data[name]['context']:
                 session_data[name]['context']['missing'] = 'MONEY'
                 if 'PERSON' in entities:
                     session_data[name]['context']['receiver_name'] = entities['PERSON']
                 response = "How much money do you want to transfer?"
+                tags = 'transfer_money'
+                step = 'missing_money'
             elif 'PERSON' not in entities and 'receiver_name' not in session_data[name]['context']:
                 session_data[name]['context']['missing'] = 'PERSON'
                 if 'MONEY' in entities:
                     session_data[name]['context']['amount'] = float(entities['MONEY'].replace('$', '').replace(',', ''))
                 response = "To whom do you want to transfer money?"
+                tags = 'transfer_money'
+                step = 'missing_person'
 
     elif intent == "inform" or intent == "affirm":
         missing_entity = session_data[name]['context'].get('missing')
@@ -472,18 +490,25 @@ def generate_response(user_input, name):
             if user_input.lower() == 'yes':
                 session_data[name]['context']['step'] = 'verify_otp'
                 response = "Please enter the OTP code sent to your registered mobile number."
+                tags = 'transfer_money'
+                step = 'verify_otp'
             else:
                 session_data[name]['context'] = {}
                 response = "Transfer cancelled."
+                tags = 'transfer_money'
+                step = 'cancelled'
         elif session_data[name]['context'].get('step') == 'verify_otp':
-        # Check if user input matches the expected OTP code pattern
             if user_input.isalnum() and len(user_input) == 6:
                 otp_code = user_input
                 receiver_name = session_data[name]['context'].pop('receiver_name')
                 amount = session_data[name]['context'].pop('amount')
                 response = transfer_money(name, receiver_name, amount, otp_code)
+                tags = 'transfer_money'
+                step = 'completed'
             else:
                 response = "Please enter the OTP code to proceed with the transfer."
+                tags = 'transfer_money'
+                step = 'verify_otp_invalid'
         elif missing_entity == 'MONEY' and 'MONEY' in entities:
             session_data[name]['context']['missing'] = None
             session_data[name]['context']['amount'] = float(entities['MONEY'].replace('$', '').replace(',', ''))
@@ -493,8 +518,12 @@ def generate_response(user_input, name):
                 account_number = transfer_money(name, receiver_name, amount)
                 session_data[name]['context'] = {'amount': amount, 'receiver_name': receiver_name, 'step': 'confirm_transfer'}
                 response = f"Please confirm the transfer to {receiver_name} with account number {account_number}. Type 'yes' to confirm or 'no' to cancel."
+                tags = 'transfer_money'
+                step = 'confirm_transfer'
             else:
                 response = "To whom do you want to transfer money?"
+                tags = 'transfer_money'
+                step = 'missing_person'
 
         elif missing_entity == 'PERSON' and 'PERSON' in entities:
             session_data[name]['context']['missing'] = None
@@ -505,8 +534,12 @@ def generate_response(user_input, name):
                 account_number = transfer_money(name, receiver_name, amount)
                 session_data[name]['context'] = {'amount': amount, 'receiver_name': receiver_name, 'step': 'confirm_transfer'}
                 response = f"Please confirm the transfer to {receiver_name} with account number {account_number}. Type 'yes' to confirm or 'no' to cancel."
+                tags = 'transfer_money'
+                step = 'confirm_transfer'
             else:
                 response = "How much money do you want to transfer?"
+                tags = 'transfer_money'
+                step = 'missing_money'
 
         elif 'PERSON' in entities and 'MONEY' in entities:
             amount = float(entities['MONEY'].replace('$', '').replace(',', ''))
@@ -514,6 +547,8 @@ def generate_response(user_input, name):
             account_number = transfer_money(name, receiver_name, amount)
             session_data[name]['context'] = {'amount': amount, 'receiver_name': receiver_name, 'step': 'confirm_transfer'}
             response = f"Please confirm the transfer to {receiver_name} with account number {account_number}. Type 'yes' to confirm or 'no' to cancel."
+            tags = 'transfer_money'
+            step = 'confirm_transfer'
 
         elif 'PERSON' in entities and 'amount' in session_data[name]['context']:
             receiver_name = entities['PERSON']
@@ -521,6 +556,8 @@ def generate_response(user_input, name):
             account_number = transfer_money(name, receiver_name, amount)
             session_data[name]['context'] = {'amount': amount, 'receiver_name': receiver_name, 'step': 'confirm_transfer'}
             response = f"Please confirm the transfer to {receiver_name} with account number {account_number}. Type 'yes' to confirm or 'no' to cancel."
+            tags = 'transfer_money'
+            step = 'confirm_transfer'
 
         elif 'MONEY' in entities and 'receiver_name' in session_data[name]['context']:
             amount = float(entities['MONEY'].replace('$', '').replace(',', ''))
@@ -528,9 +565,13 @@ def generate_response(user_input, name):
             account_number = transfer_money(name, receiver_name, amount)
             session_data[name]['context'] = {'amount': amount, 'receiver_name': receiver_name, 'step': 'confirm_transfer'}
             response = f"Please confirm the transfer to {receiver_name} with account number {account_number}. Type 'yes' to confirm or 'no' to cancel."
+            tags = 'transfer_money'
+            step = 'confirm_transfer'
 
         else:
             response = "Sorry, I don't understand your query."
+            tags = 'unrecognized'
+
     elif intent == "search_transactions":
         sender_surname = session_data.get("PERSON", name)
         if any(keyword in user_input.lower() for keyword in ["last", "latest", "top"]) and "transactions" in user_input.lower():
@@ -540,26 +581,41 @@ def generate_response(user_input, name):
         else:
             date_expr = user_input
             response = fetch_transactions_by_name_and_date_expr(sender_surname, date_expr)
+        tags = 'search_transactions'
+        step = '1'
+
     elif intent == "check_human":
         response = "I am an AI created to assist you with financial inquiries."
+        tags = 'check_human'
+
     elif intent == 'open_account':
         response = "To open a new account, please visit our website or nearest branch with your identification documents."
+        tags = 'open_account'
+
     elif intent == 'close_account':
         response = "To close your account, please visit our nearest branch or contact our customer support."
+        tags = 'close_account'
+
     elif intent == "loan_inquiry":
         response = "You can inquire about loans and their eligibility criteria on our website or by visiting our branch."
+        tags = 'loan_inquiry'
+
     elif intent == 'credit_card_application':
         response = "You can apply for a credit card through our website or by visiting our nearest branch."
+        tags = 'credit_card_application'
+
     elif intent == 'contact_support':
         response = "You can contact our customer support through the chat feature on our website or by calling our support number."
+        tags = 'contact_support'
 
     # Check if response was set, otherwise return default response
     if response is None:
         response = "I'm sorry, I didn't understand your request. Can you please rephrase?"
         logging.debug("Default response used.")
+        tags = 'default'
 
     logging.debug(f"Final response: {response}")
-    response_json = json.dumps({'response': response})
+    response_json = json.dumps({'response': response, 'tags': tags, 'step' : step})
     return response_json
 
 @app.route('/')
