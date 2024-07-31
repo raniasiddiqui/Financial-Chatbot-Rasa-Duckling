@@ -1,0 +1,662 @@
+Intent,Example
+check_human,are you a bot?
+check_human,am i speaking to an ai?
+check_human,are you a human or a bot?
+check_human,are you real?
+check_human,are you virtual?
+check_human,are you an ai?
+check_human,aren't you a bot
+check_human,are you a chatbot
+check_human,are you a rasa bot?
+check_human,are you a real bot?
+check_human,are you a robot
+check_human,are you ai
+check_human,are you artificial
+check_human,are you artificial intelligence
+check_human,are you real
+check_human,are you really a bot
+check_human,are you robot
+check_human,are you sure that you're a bot?
+check_human,bot?
+affirm,indeed
+affirm,correct
+affirm,that sounds good
+affirm,yes
+affirm,yess please
+affirm,of course
+affirm,yup
+affirm,yeah
+affirm,yes please
+affirm,yes plz
+affirm,Sure
+affirm,Ok
+affirm,sweet
+affirm,"cool,"
+affirm,yes...
+affirm,y
+affirm,ok
+affirm,ye
+affirm,okay
+affirm,That would be great
+affirm,YES
+affirm,YUP
+affirm,Yea
+affirm,Yeah
+affirm,Yeah sure
+affirm,Yep
+affirm,Yep that's fine
+affirm,Yep!
+affirm,Yepp
+affirm,Yes
+affirm,Yes I do
+affirm,Yes please
+affirm,Yes please!
+affirm,"Yes, I accept"
+ask_transfer_charge,Will I be charged for transferring money
+ask_transfer_charge,do transfers cost something?
+ask_transfer_charge,is there a transfer charge?
+ask_transfer_charge,Is there a charge
+ask_transfer_charge,will i be charged for a transaction?
+ask_transfer_charge,do xfers cost something?
+ask_transfer_charge,is there a transfer fee
+ask_transfer_charge,is there a xfer fee
+ask_transfer_charge,how much is the transfer fee
+ask_transfer_charge,whats the cost of transferring money
+ask_transfer_charge,what am I charged upon money transfer
+ask_transfer_charge,are you gonna bill me for this exchange
+ask_transfer_charge,whats the xfer price for this account
+ask_transfer_charge,okay but how much to move this money?
+ask_transfer_charge,how much is the fee to shift my money around
+ask_transfer_charge,if I send money to someone will I be charged extra for that?
+ask_transfer_charge,is there a charge when I send money to someone
+ask_transfer_charge,what is the fee for sending money to someone else
+ask_transfer_charge,I sent money to my friend will I be charged extra for that
+ask_transfer_charge,what is the percentage fee for transactions to another person
+ask_transfer_charge,are there any transaction fees or charges I should know about?
+ask_transfer_charge,tell me about transfer fees
+check_balance,How much money is on my account?
+check_balance,How much money is on my [bank](account_type) account?
+check_balance,what's my [balance](amount-of-money)?
+check_balance,what's my [current balance](amount-of-money)?
+check_balance,What's left on that account?
+check_balance,How much do I have on that account?
+check_balance,What's the [balance](amount-of-money) on that account?
+check_balance,How much money is left on that account?
+check_balance,what is my account [balance](amount-of-money)
+check_balance,what's my account [balance](amount-of-money)?
+check_balance,what's my account [balance](amount-of-money)
+check_balance,whats my account [balance](amount-of-money)
+check_balance,what is my [bank](account_type) account [balance](amount-of-money)
+check_balance,what's my [bank](account_type) account [balance](amount-of-money)?
+check_balance,what's my [bank](account_type) account [balance](amount-of-money)
+check_balance,whats my [bank](account_type) account [balance](amount-of-money)
+check_balance,What's my [credit card](account_type) [balance](amount-of-money)
+check_balance,What's my [credit](account_type) [balance](amount-of-money)
+check_balance,How much money do I owe on my [credit cards](account_type)
+check_balance,Show me my [credit card](account_type) [balance](amount-of-money)
+check_balance,What [credit](account_type) accounts do I have
+check_balance,Show me my [credit](account_type) accounts
+check_balance,Whats the [balance](amount-of-money) on my [credit](account_type) account
+check_balance,What's my [credit](account_type) account
+check_balance,What's my [emblem](credit_card) [card](account_type) [balance](amount-of-money)
+check_balance,Show me my [iron bank](credit_card) [balance](amount-of-money)
+check_balance,What's my [justice bank](credit_card) [balance](amount-of-money)
+check_balance,What's the [balance](amount-of-money) on the [justice bank](credit_card) account
+check_balance,what's my [emblm](credit_card) [credit card](account_type) [balance](amount-of-money)?
+check_balance,what's my [credit card](account_type) [balance](amount-of-money)?
+check_balance,what's my [credit card](account_type) account [balance](amount-of-money)?
+check_balance,What is my [emblem](credit_card) [card](account_type) [balance](amount-of-money)?
+check_balance,whats my [credit card](account_type) [balance](amount-of-money)
+check_balance,What is my [emblem](credit_card) [balance](amount-of-money)?
+check_balance,whats my [emblm](credit_card) [card](account_type) [balance](amount-of-money)?
+check_balance,what's my [embelm](credit_card)'s [card](account_type) [balance](amount-of-money)?
+check_balance,what's my [emblm](credit_card) account [balance](amount-of-money)?
+check_balance,How much money have i spent lately>
+check_balance,"I should check my [credit card]{""entity"": ""account_type"", ""value"": ""credit""} [balance](amount-of-money) [first](account_type)"
+check_balance,"check my [credit card]{""entity"": ""account_type"", ""value"": ""credit""} [balance](amount-of-money)"
+check_balance,"check my [credit card]{""entity"": ""account_type"", ""value"": ""credit""} [balance](amount-of-money) [first](account_type)"
+check_balance,Can you tell me my account [balance](amount-of-money)?
+check_balance,"Hello, I would like to know how much money is in much money is in my account"
+check_balance,"hi, whats my account bal please"
+check_balance,so.... what's my [balance](amount-of-money)?
+check_balance,whats my [current balance](amount-of-money)
+check_balance,What's my [balance](amount-of-money)?
+check_balance,How much money do I have?
+check_balance,"Yeah, I like coffee 👀 But how much money do I have?"
+check_balance,"Yeah, I know 😀 Since it's so nice: How much money do I have?"
+check_balance,what places have I spent money?
+check_balance,"Wait, I'll have to check my balance first. Can you do that please?"
+check_balance,"Hi, I need to know how much money is in my [checking](account_type) account"
+check_balance,Balance please
+check_earnings,How much money went into my account last month?
+check_earnings,How much money did I make last year?
+check_earnings,What did I earn last month?
+check_earnings,How much did I make last month?
+check_earnings,How much money did I make last week?
+check_earnings,how much was deposited in my account last month?
+check_earnings,how much was deposited in my account in the last two weeks?
+check_earnings,check deposits for last week
+check_earnings,total deposits over last year
+check_earnings,how much was deposited in January
+check_earnings,how much money have I earned?
+check_earnings,what did I earn?
+check_earnings,How much have i earned?
+check_earnings,how much did I make
+check_earnings,am I rich yet?
+check_earnings,am I a millionaire
+check_earnings,how much cash is rolling through my account
+check_earnings,how much money is in the money making machine account?
+check_earnings,what did I make in the last year?
+check_earnings,show me how much I've earned in the last week
+check_earnings,can i afford to go on vacation
+check_earnings,rent is due soon how much do I have in my account
+deny,not really
+deny,no
+deny,I don't think so
+deny,never
+deny,no way
+deny,nope
+deny,no thanks
+deny,I dunno
+deny,Nothing!
+deny,nevermind
+deny,n
+deny,i decline
+deny,i don not like this
+deny,i don't think so
+deny,i don't want either of those
+deny,i don't want to
+deny,i don't want to give you my email
+deny,i dont want to
+deny,i dont want to accept :P lol
+deny,i guess it means - no
+deny,i'm afraid not
+deny,i'm not sure
+goodbye,see you later
+goodbye,goodbye
+goodbye,i'm done
+goodbye,quit
+goodbye,stop
+goodbye,bye
+goodbye,Adios
+goodbye,BYEE
+goodbye,GOODBYE
+goodbye,Thanks a lot. See ya later
+goodbye,"have a good day. time to go, bye"
+goodbye,bye bye
+goodbye,ok i gtg
+goodbye,bye bye bot
+goodbye,bye for now
+goodbye,bye udo
+goodbye,bye was nice talking to you
+goodbye,bye!
+goodbye,byee
+goodbye,catch you later
+goodbye,ciao
+goodbye,cya
+goodbye,farewell
+goodbye,good bye
+goodbye,good bye rasa bot!
+goodbye,good night
+goodbye,goodbye
+goodbye,goodbye.
+goodbye,goodnight
+goodbye,gotta go
+greet,yo
+greet,good morning
+greet,hi
+greet,hey there
+greet,hey
+greet,good evening
+greet,hello
+greet,Hello?
+greet,HEY
+greet,hello are you still there
+greet,hallo
+greet,HI
+greet,Hey
+greet,Hi
+greet,hi!
+greet,hello there
+greet,hi there
+greet,Hello
+greet,hello its ella
+greet,Hola.
+greet,welcome
+greet,howdy
+greet,good day
+inform,$10
+inform,5000
+inform,500
+inform,$100
+inform,$500
+inform,100 dollars
+inform,1000 dollars
+inform,tomorrow
+inform,next week
+inform,yesterday
+inform,for today
+inform,last week
+inform,the past month
+inform,the past two days
+inform,the last two weeks
+inform,at [amazon](vendor_name)
+inform,[starbucks](vendor_name)
+inform,at [target](vendor_name)
+inform,at [starbucks](vendor_name)
+inform,[target](vendor_name)
+inform,[Amazon](vendor_name)
+inform,[Starbucks](vendor_name)
+inform,[Target](vendor_name)
+inform,I want to pay the [current balance](amount-of-money)
+inform,[current balance](amount-of-money)
+inform,[full](amount-of-money)
+inform,in [full](amount-of-money)
+inform,the [full balance](amount-of-money)
+inform,[minimum balance](amount-of-money)
+inform,I want to pay the [minimum balance](amount-of-money)
+inform,the [current balance](amount-of-money)
+inform,the [minimum balance](amount-of-money)
+inform,my [minimum balance](amount-of-money)
+inform,my [current balance](amount-of-money)
+inform,[emblem](credit_card) [card](account_type)
+inform,all [cards](account_type)
+inform,[iron bank](credit_card) [card](account_type)
+inform,[justice bank](credit_card) [card](account_type)
+inform,[emblem](credit_card)
+inform,[iron bank](credit_card)
+inform,[justice bank](credit_card)
+inform,[emblem](credit_card) account
+inform,[iron bank](credit_card) account
+inform,[justice bank](credit_card) account
+inform,[emblem](credit_card) [credit card](account_type)
+inform,[iron bank](credit_card) [credit card](account_type)
+inform,[justice bank](credit_card) [credit card](account_type)
+inform,my [emblem](credit_card) [credit card](account_type)
+inform,my [iron bank](credit_card) [credit card](account_type)
+inform,my [justice bank](credit_card) [credit card](account_type)
+inform,my [emblem](credit_card) [card](account_type)
+inform,my [iron bank](credit_card) [card](account_type)
+inform,my [justice bank](credit_card) [card](account_type)
+inform,towards my [emblem](credit_card) [card](account_type)
+inform,towards my [iron bank](credit_card) [card](account_type)
+inform,towards my [justice bank](credit_card) [card](account_type)
+inform,for sunday
+inform,for friday
+inform,for tomorrow
+inform,for saturday
+inform,I want to pay the [minimum balance](amount-of-money) on my [emblem](credit_card) [credit card](account_type) today
+inform,today
+inform,Please schedule it for the first of next month
+inform,a hundred dollars
+inform,[mastercard](credit_card)
+inform,[visa](credit_card)
+inform,[american express](credit_card)
+inform,my [rasa](credit_card) account
+inform,"my [credit card]{""entity"": ""account_type"", ""value"": ""credit""} account ending in 4321"
+inform,My [Visa](credit_card) account
+inform,A friend.
+inform,[Alexandra](PERSON)?
+inform,today please
+inform,[Iron Bank](credit_card)
+inform,My [visa](credit_card)
+inform,[Bob](PERSON)
+inform,[bill](PERSON)
+inform,[anusha](PERSON)
+inform,[John](PERSON)
+inform,[gary](PERSON)
+inform,[Claire](PERSON)
+inform,[Imani](PERSON)
+inform,[darnell](PERSON)
+inform,[Guangchen](PERSON)
+inform,[cheng](PERSON)
+inform,to my [brother](PERSON)
+inform,to my [sister](PERSON)
+inform,my [dad](PERSON)
+inform,William Baker
+inform,Evan Oslo
+inform,Lisa Macintyre
+inform,Karen Lancaster
+inform,Percy Donald
+inform,Kyle Gardner
+inform,Katy Parrow
+inform,Percy please
+inform,Laura Schilling
+inform,"In that case, let's go with Percy"
+inform,My chase
+inform,Jane
+inform,Melinda
+inform,Sara
+inform,my wife's
+inform,Andreas
+inform,htthis weekend
+inform,all of them
+inform,Darren Smith
+inform,Percy
+inform,percy donald
+inform,danIelle smilanich
+inform,[Gringtos](credit_card)
+pay_cc,I would like to pay the [minimum balance](amount-of-money) on my [embelm](credit_card) [card](account_type)
+pay_cc,I want to pay my [credit card](account_type)
+pay_cc,I want to pay my [card](account_type)
+pay_cc,Pay my [card](account_type)
+pay_cc,I want to pay my [justice bank](credit_card) bill
+pay_cc,Pay my [discover](credit_card)
+pay_cc,I want to pay my [iron bank](credit_card) bill
+pay_cc,Pay my [visa](credit_card)
+pay_cc,I want to pay my [visa](credit_card) bill
+pay_cc,Pay my [mastercard](credit_card)
+pay_cc,I want to pay my [MasterCard](credit_card) bill
+pay_cc,I want to pay my [credit card](account_type) bill
+pay_cc,I want to pay the [current balance](amount-of-money) on my [credit card](account_type)
+pay_cc,can you help me pay the [current balance](amount-of-money) on my [credit card](account_type)
+pay_cc,i want to pay off my [credit card](account_type)
+pay_cc,I want to pay off my [credit card](account_type)
+pay_cc,i want to pay my [credit card](account_type)
+pay_cc,i want to pay off my [emblem](credit_card) [credit card](account_type)
+pay_cc,I want to pay my [current balance](amount-of-money) on my [embelm](credit_card) [credit card](account_type)
+pay_cc,i want to pay my [current balance](amount-of-money) on my [emblem](credit_card) [credit card](account_type)
+pay_cc,I want to pay $500 on my [emblem](credit_card) [credit card](account_type) on Sunday
+pay_cc,I want to pay my [current balance](amount-of-money) on my [emblem](credit_card) [credit card](account_type) today
+pay_cc,i need to pay off my [emblm](credit_card) [credit card](account_type)
+pay_cc,Please schedule  a payment towards my [credit card](account_type) for April 12th
+pay_cc,Can I schedule a payment towards my [credit card](account_type) for tomorrow?
+pay_cc,Pay off my [minimum balance](amount-of-money) please
+pay_cc,"i would like to pay $1200 to my [credit card]{""entity"": ""account_type"", ""value"": ""credit""}"
+pay_cc,I would also like to pay my [visa](credit_card) bill
+pay_cc,"Pay off my [credit card]{""entity"": ""account_type"", ""value"": ""credit""}, please"
+pay_cc,"I guess it is. Since it's so much, let's pay off my [credit](account_type)"
+pay_cc,"Let's pay that [credit card]{""entity"": ""account_type"", ""value"": ""credit""} bill"
+pay_cc,"I want to pay 100 dollars toward my [Emblem](credit_card) [card](account_type), tomorrow"
+pay_cc,"pay 100 towards [emblem](credit_card) [card](account_type), tomorrow"
+pay_cc,id like to pay my bill
+pay_cc,"could I pay off my [credit card]{""entity"": ""account_type"", ""value"": ""credit""}?"
+pay_cc,"pay off my [credit card]{""entity"": ""account_type"", ""value"": ""credit""}"
+pay_cc,"i wanna pay my [credit card]{""entity"": ""account_type"", ""value"": ""credit""}"
+pay_cc,pay a bill
+pay_cc,"can I pay my [card]{""entity"": ""account_type"", ""value"": ""credit""}?"
+search_transactions,how much did I spend at [Target](vendor_name) this week?
+search_transactions,what is my typical spending at [Amazon](vendor_name)?
+search_transactions,I want to check my spending history
+search_transactions,how much did I spend at [Starbucks](vendor_name) last week?
+search_transactions,I need to check my spending history
+search_transactions,I want to check my spending
+search_transactions,I want to check my spending history at [starbucks](vendor_name)
+search_transactions,i want to check my spending history
+search_transactions,i want to see my transaction history
+search_transactions,I want to search my past transactions
+search_transactions,can I search my transaction history
+search_transactions,can I look at past transactions
+search_transactions,I want to search my transactions with [amazon](vendor_name)
+search_transactions,can i seem my transactions with [target](vendor_name)
+search_transactions,how much did i spend at [starbucks](vendor_name) last month?
+search_transactions,what did i spend last month?
+search_transactions,How much did I spend last month?
+search_transactions,What did I spend at [Legoland](vendor_name) last month?
+search_transactions,What did I spend at [Legoland](vendor_name) last year?
+search_transactions,how much did i spend at [starbucks](vendor_name) last year
+search_transactions,Yes! How much did I spend on [Starbucks](vendor_name) last month?
+search_transactions,How much did I spend at Burger King last month?
+search_transactions,what places have I spent money?
+search_transactions,What did I spend at [Starbucks](vendor_name) in may?
+search_transactions,How much money did I lose to [starbucks](vendor_name) in may?
+search_transactions,Oh how much did I actually spend at [target](vendor_name) last month? I'd love to know.
+search_transactions,Can you tell me how much I spent at [Ikea](vendor_name) this month?
+search_transactions,Can you tell me how much I spent at coffeeshops this month?
+search_transactions,Can you tell me how much I spent on coffee this month?
+search_transactions,What did I spend at [Costco](vendor_name) last month?
+search_transactions,what did I spend at [target](vendor_name) last month
+search_transactions,where did I spend the most money last month?
+thankyou,thank you goodbye
+thankyou,okay thank you goodbye
+thankyou,thank you bye
+thankyou,um okay thank you good bye
+thankyou,thank you
+thankyou,and thats all thank you and good bye
+thankyou,okay thank you
+thankyou,thanks
+thankyou,thanks goodbye
+thankyou,thank you and good bye
+thankyou,Thanks!
+thankyou,"Awesome, you are a good bot!"
+thankyou,great!
+thankyou,"I see, thanks"
+thankyou,Oh thats good!
+thankyou,it's good :-)
+thankyou,thnaks
+thankyou,good job bot
+thankyou,great
+thankyou,thanks for the help
+thankyou,thanks you
+thankyou,thanks!
+thankyou,thankyou
+thankyou,thnks
+thankyou,thx
+thankyou,thanks for your information
+thankyou,thanks f
+transfer_money,I want to pay [John](PERSON)
+transfer_money,I want to transfer $100 to [Bob](PERSON)
+transfer_money,can i transfer money to [Sally](PERSON)
+transfer_money,I want to transfer money
+transfer_money,I want to pay someone
+transfer_money,can I pay someone
+transfer_money,I need to transfer money to a friend
+transfer_money,can I transfer money to my [mom](PERSON)
+transfer_money,I want to pay [Bert](PERSON)
+transfer_money,pay my friend
+transfer_money,transfer money
+transfer_money,I want to transfer $100 to [Tommy](PERSON)
+transfer_money,i want to transfer $400 to [Akela](PERSON)
+transfer_money,I want to pay [Paula Handy](PERSON)
+transfer_money,pay Katy Parrow $40 please
+transfer_money,transfer $60 to [Jason Jacob](PERSON)
+transfer_money,pay [Evan Oslo](PERSON)
+transfer_money,pay [Lisa](PERSON) please
+transfer_money,can I transfer money to [Kyle Gardner](PERSON)?
+transfer_money,Pay [Karen](PERSON) 60 Euros
+transfer_money,pay [Mona](PERSON) $60
+transfer_money,transfer $60 to [Sally](PERSON)
+transfer_money,need to transfer money
+transfer_money,II want to transfer to [Kelly](PERSON)
+transfer_money,Pay [Percy](PERSON) $50
+transfer_money,Pay $50 to [Pat](PERSON)
+transfer_money,Ok pay [Emma](PERSON)
+transfer_money,pay [Emanual](PERSON)
+transfer_money,i want to transfer $100 to [Jane smith](PERSON)
+transfer_money,i want to transfer $100 to my [daughter](PERSON)
+transfer_money,i want to transfer money please
+transfer_money,i mean i want to transfer money
+transfer_money,I need to pay a friend.
+transfer_money,transfer money to [ethan oswald](PERSON)
+transfer_money,transfer money to [sara](PERSON)
+transfer_money,I need to transfer money to my grandma [Judith](PERSON).
+transfer_money,i want to transfer money to [Latisha](PERSON)
+transfer_money,"I need to make an urgent transfer to [Bob](PERSON), can you do it?"
+transfer_money,"Ahh, okay so I want to make a transfer to [Bob](PERSON)."
+transfer_money,Can I transfer money to a friend?
+transfer_money,"I need to transfer money to [Jeff](PERSON), my son"
+transfer_money,I need to send money to my kid
+transfer_money,I need to transfer money
+transfer_money,send $50 to [john jacob](PERSON)
+transfer_money,I need to transfer money to my co-worker who paid for lunch
+transfer_money,Hi I like to send money
+transfer_money,I'd like to send 50$ to [John](PERSON)
+transfer_money,Hi I like to send money to [John](PERSON)
+transfer_money,Please transfer 50 dollars to [Andreas](PERSON)
+transfer_money,I would like to transfer money to [Philipp](PERSON)
+transfer_money,I would like to transfer 50$ to [Joschka](PERSON)
+check_recipients,Who can I send money to?
+check_recipients,Who are my known recipients
+check_recipients,Show me my list of recipients
+check_recipients,Show the recipient list
+check_recipients,Show me people I can send money to
+check_recipients,Who is a valid payee
+check_recipients,who can I pay?
+check_recipients,who can I transfer money?
+check_recipients,who's in my recipient list?
+check_recipients,who can I transfer money to?
+check_recipients,Who is on your list?
+check_recipients,who is in my list of kown recipients?
+check_recipients,Who all can I transfer money to?
+check_recipients,Who can I transfer money to?
+check_recipients,Okay. Who can I transfer money to then?
+check_recipients,can I see the list of known recipients?
+check_recipients,tell me who I can share my money with
+check_recipients,whats my recipient list
+check_recipients,can I send money to anyone?
+check_recipients,who exactly am I able to send money to
+check_recipients,if I want to transfer money can i send it to anyone
+check_recipients,show me my money sending list
+help,help
+help,what can you do?
+help,what can I ask you?
+help,what do you do?
+help,what can you help me with?
+help,help me
+help,"help, what do you do"
+help,how do I use this
+help,how can you help me
+help,What are the things that you can do?
+help,What else can you help me with?
+help,can you do anything else?
+help,can you help me?
+help,come back
+help,cool! can I do something else here?
+help,hello what can you do for me
+help,help
+help,help me
+help,help please
+help,help pls
+help,help?
+help,hep me
+human_handoff,handoff
+human_handoff,operator
+human_handoff,I want a human
+human_handoff,can I speak to an agent
+human_handoff,real agent please
+human_handoff,real human
+human_handoff,chat with a live agent
+human_handoff,give me a person please
+human_handoff,i want to talk to a human
+human_handoff,transfer to a human
+human_handoff,Please give me to a human
+human_handoff,can I talk to human?
+human_handoff,can I talk to human
+human_handoff,talk to human
+human_handoff,i want human :(
+human_handoff,can i talk to human
+human_handoff,i want to talk to a human
+human_handoff,i want to speak to human
+human_handoff,can i talk to a real person?
+human_handoff,connect me to a real person
+human_handoff,I need a real person
+human_handoff,can i took with a real person
+human_handoff,let me speak to a real person
+human_handoff,let me speak to a real person please
+human_handoff,i want to talk to a real person
+out_of_scope,what is the square root of 5
+out_of_scope,I want to know the weather
+out_of_scope,what is the meaning of life.
+out_of_scope,Fridge Isn't Running
+out_of_scope,my tv isn't working
+out_of_scope,I want a pizza
+out_of_scope,my washing machine isn't working
+out_of_scope,what year is it
+out_of_scope,order a pizza
+out_of_scope,I want to order a pizza
+out_of_scope,what is the weather today
+out_of_scope,what is the weather
+out_of_scope,what the weather today ?
+out_of_scope,hows the weather
+out_of_scope,tell me a joke
+out_of_scope,Can I get a hamburger?
+out_of_scope,Can YouTube talk?
+out_of_scope,Can you call me back ?
+out_of_scope,Can you give me your datacenter's password
+out_of_scope,Can you give me your datacenter's password?
+out_of_scope,Can you make sandwiches?
+out_of_scope,Can you please send me an uber
+out_of_scope,ofif fsdfafsfs
+credit,credit card
+credit,credit cards
+credit,credit account
+credit,credit accounts
+credit,card
+credit,cards
+credit,credit card account
+emblem,emblm
+emblem,embelm
+emblem,Emblem
+current balance,balance
+current balance,full
+current balance,full balance
+check_reward_point,How many reward points do I have?
+check_reward_point,Check my reward point.
+check_reward_point,What is my current reward point?
+check_reward_point,Show me my reward points.
+check_reward_point,How many points are in my rewards account?
+check_reward_point,What are my available reward points?
+check_reward_point,Can you tell me my reward points?
+check_reward_point,I want to know my reward points.
+check_reward_point,Check my reward points.
+check_reward_point,How many loyalty points do I have?
+check_reward_point,What is my reward point?
+check_reward_point,Tell me my reward points.
+check_reward_point,How many points do I have in my rewards account?
+check_reward_point,Show my current reward points.
+check_reward_point,How many reward point do I have?
+check_reward_point,Show me my reward point.
+check_reward_point,What�s my current reward point?
+check_reward_point,reward points
+check_reward_point,reward point
+check_reward_point,Show me my current points
+check_reward_point,I want to find out my current reward points
+check_reward_point,Show me my current point 
+check_reward_point,What are my available points?
+check_reward_point,What are my available point 
+check_reward_point,Tell me my points
+check_reward_point,Tell me my point 
+check_reward_point,How many points do I have in my  account?
+check_reward_point,Show me my points
+check_reward_point,Check my points 
+check_reward_point,How many points are in my account?
+check_reward_point,I want to know my points.
+check_reward_point,Check my point 
+branch_location,I need to find a branch that's open on Saturday
+branch_location,Are there any branches open on Saturday?
+branch_location,Which branches are open on Saturday?
+branch_location,Find a branch that is open on Saturday.
+branch_location,Can you tell me which branch is open on Saturday?
+branch_location,Where can I find a branch open on Saturday?
+branch_location,Show me branches that are open on Saturday.
+branch_location,Locate branches that are open on Saturday
+branch_location,Which bank branches are open on Saturday?
+branch_location,Tell me the branches that open on Saturday
+branch_location,Find bank branches open on Saturday.
+branch_location,Are there any bank branches open on Saturday?
+branch_location,Can you locate a branch that's open on Saturday?
+branch_location,What branches are open on Saturday?
+branch_location,Which nearby branches are open on Saturday?
+branch_location,Are there any branches open on Sunday?
+branch_location,Which branches are open on Sunday?
+branch_location,Find me a branch that is open on Sunday
+branch_location,Are there any branches open on weekdays?
+branch_location,Are bank branches open on weekdays?
+branch_location,Are there any branches open on Monday?
+branch_location,Which nearby branches are open on Monday?
+branch_location,Are bank branches open on mondays?
+branch_location,Find me a branch that is open on Monday
+branch_location,Are there any branches open on Tuesday?
+branch_location,Which nearby branches are open on Tuesday?
+branch_location,Are bank branches open on tuesdays?
+branch_location,Find me a branch that is open Tuesday
+branch_location,Are there any branches open on Wednesday?
+branch_location,Find me a branch that is open on Wednesday
+branch_location,Which nearby branches are open on Wednesday?
+branch_location,Find me a branch that is open on Thursday 
+branch_location,Are there any branches open on Thursday?
+branch_location,Can you locate a branch that's open on Thursday?
+branch_location,Are there any branches open on Friday?
+branch_location,Which nearby branches are open on Friday?
+branch_location,Are bank branches open on fridays?
+branch_location,Find me a branch that is open on Friday
