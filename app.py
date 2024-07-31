@@ -29,7 +29,7 @@ nlp = spacy.load("en_core_web_sm")
 
 # Load BERT model and tokenizer
 logging.info("Loading BERT model and tokenizer...")
-model_path = r"C:\Users\Lenovo\Downloads\modellll-20240725T072010Z-001\modellll"
+model_path = r"C:\Users\Lenovo\Downloads\model_bert_based_\model_bert_based"
 tokenizer = BertTokenizer.from_pretrained(model_path)
 model = BertForSequenceClassification.from_pretrained(model_path)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -283,17 +283,27 @@ def fetch_reward_points(surname):
     logging.debug(reward_point_message)
     return reward_point_message
 
-def fetching_branch_location():
-    logging.debug("Fetching branch locations open on weekends")
+def fetching_branch_location(user_input):
+    logging.debug("Fetching branch locations based on user input")
     conn = sqlite3.connect(r"C:\Users\Lenovo\Downloads\chatbot_tranc.db")
     cursor = conn.cursor()
     
-    # Define the query to fetch branches open on weekends
-    query = '''
-    SELECT name, address 
-    FROM branch_location
-    WHERE is_weekend_open = 1
-    '''
+    # Define the query and response message based on the user input
+    if "saturday" in user_input.lower():
+        query = '''
+        SELECT name, address 
+        FROM branch_location
+        WHERE is_weekend_open = 1
+        '''
+        day = "Saturday"
+    elif "sunday" in user_input.lower():
+        return "No, all branches are closed on Sundays."
+    else:
+        query = '''
+        SELECT name, address 
+        FROM branch_location
+        '''
+        day = next(day.capitalize() for day in ["monday", "tuesday", "wednesday", "thursday", "friday"] if day in user_input.lower())
     
     cursor.execute(query)
     results = cursor.fetchall()
@@ -301,35 +311,48 @@ def fetching_branch_location():
     
     if results:
         branches = [f"Name: {row[0]}, Address: {row[1]}" for row in results]
-        return f"Branches open on weekends:\n" + "\n".join(branches)
+        return f"Branches open on {day} are:\n" + "\n".join(branches)
     else:
-        return "No branches are open on weekends."
+        return f"No branches are open on {day}."
+import logging
+import sqlite3
 
-
-def transfer_money(name, receiver_name, amount):
+def transfer_money(name, receiver_name, amount, otp_code=None):
     logging.debug(f"Transferring money from {name} to {receiver_name} amount: {amount}")
     conn = sqlite3.connect(r"C:\Users\Lenovo\Downloads\chatbot_tranc.db")
     c = conn.cursor()
 
-    # Fetch sender's balance by surname
-    c.execute('SELECT Balance FROM customers WHERE Surname = ?', (name,))
-    sender_balance = c.fetchone()
+    # Fetch sender's balance and OTP code by surname
+    c.execute('SELECT Balance, otp_code FROM customers WHERE Surname = ?', (name,))
+    sender_data = c.fetchone()
 
-    # Fetch receiver's balance by surname
-    c.execute('SELECT Balance FROM customers WHERE Surname = ?', (receiver_name,))
-    receiver_balance = c.fetchone()
+    # Fetch receiver's balance and account number by surname
+    c.execute('SELECT Balance, account_number FROM customers WHERE Surname = ?', (receiver_name,))
+    receiver_data = c.fetchone()
 
-    if not receiver_balance:
+    if not receiver_data:
         conn.close()
         return f"Receiver with Name {receiver_name} not found."
-    if not sender_balance or sender_balance[0] < amount:
+    if not sender_data or sender_data[0] < amount:
         conn.close()
         return f"Insufficient funds."
 
+    sender_balance, sender_otp_code = sender_data
+    receiver_balance, receiver_account_number = receiver_data
+
+    if otp_code is None:
+        conn.close()
+        return receiver_account_number  # Return account number for confirmation
+
+    if otp_code != sender_otp_code:
+        conn.close()
+        return "Invalid OTP code."
+
     try:
         # Begin transaction
-        logging.debug(f"Sender's balance before transfer: ${sender_balance[0]}")
-        logging.debug(f"Receiver's balance before transfer: ${receiver_balance[0]}")
+        logging.debug(f"Sender's balance before transfer: ${sender_balance}")
+        logging.debug(f"Receiver's balance before transfer: ${receiver_balance}")
+
         conn.execute('BEGIN TRANSACTION')
 
         # Decrease balance of sender
@@ -359,8 +382,8 @@ def transfer_money(name, receiver_name, amount):
         conn.close()
         return f"Failed to transfer money due to: {str(e)}"
 
-session_data = {}
 
+session_data = {}
 def generate_response(user_input, name):
     intent = classify_intent(user_input)
     logging.debug(f"Detected intent: {intent}")
@@ -370,7 +393,7 @@ def generate_response(user_input, name):
 
     # Initialize chat history if not already present
     if name not in session_data:
-        session_data[name] = {'chat_history': [], 'context': {}}
+        session_data[name] = {'chat_history': [], 'context': {}, 'interrupted_context': {}}
 
     # Append user query to chat history
     session_data[name]['chat_history'].append({'user': user_input, 'intent': intent, 'entities': entities})
@@ -378,17 +401,45 @@ def generate_response(user_input, name):
 
     response = None  # Initialize response as None
 
+    def restore_context():
+        missing_entity = session_data[name]['context'].get('missing')
+        if missing_entity == 'MONEY':
+            return "How much money do you want to transfer?"
+        elif missing_entity == 'PERSON':
+            return "To whom do you want to transfer money?"
+        return ""
+
+    def save_interrupted_context():
+        if session_data[name]['context']:
+            session_data[name]['interrupted_context'] = session_data[name]['context'].copy()
+            session_data[name]['context'] = {}
+
+    def restore_interrupted_context():
+        if session_data[name]['interrupted_context']:
+            session_data[name]['context'] = session_data[name]['interrupted_context'].copy()
+            session_data[name]['interrupted_context'] = {}
+
     if intent == "check_balance":
-        response = fetch_customer_balance(name)
+        save_interrupted_context()
+        balance_response = fetch_customer_balance(name)
+        context_response = restore_context()
+        print(restore_context)
+        response = f"{balance_response} {context_response}".strip()
+        restore_interrupted_context()
+        print(restore_interrupted_context)
     elif intent == "check_reward_point":
-        response = fetch_reward_points(name)
+        save_interrupted_context()
+        reward_response = fetch_reward_points(name)
+        context_response = restore_context()
+        print(restore_context)
+        response = f"{reward_response} {context_response}".strip()
+        restore_interrupted_context()
+        print(restore_interrupted_context)
     elif intent == "branch_location":
-        if any(day in user_input.lower() for day in ["monday", "tuesday", "wednesday", "thursday", "friday", "weekdays"]):
-            response = "Yes, all branches are open on weekdays."
-        elif "sunday" in user_input.lower():
-            response = "No, all branches are closed on sundays."
+        if any(day in user_input.lower() for day in ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]):
+            response = fetching_branch_location(user_input)
         else:
-            response = fetching_branch_location()
+            response = "Please specify a day of the week."
     elif intent == "transfer_money":
         missing_entities = []
         if 'MONEY' not in entities and 'amount' not in session_data[name]['context']:
@@ -396,14 +447,12 @@ def generate_response(user_input, name):
         if 'PERSON' not in entities and 'receiver_name' not in session_data[name]['context']:
             missing_entities.append('PERSON')
 
-        print('missing_entities',missing_entities)
-
         if not missing_entities:
             amount = float(entities['MONEY'].replace('$', '').replace(',', ''))
             receiver_name = entities['PERSON']
-            # Clear the session context for this conversation
-            session_data[name]['context'] = {}
-            response = transfer_money(name, receiver_name, amount)
+            account_number = transfer_money(name, receiver_name, amount)
+            session_data[name]['context'] = {'amount': amount, 'receiver_name': receiver_name, 'step': 'confirm_transfer'}
+            response = f"Please confirm the transfer to {receiver_name} with account number {account_number}. Type 'yes' to confirm or 'no' to cancel."
         else:
             if 'MONEY' not in entities and 'amount' not in session_data[name]['context']:
                 session_data[name]['context']['missing'] = 'MONEY'
@@ -412,54 +461,76 @@ def generate_response(user_input, name):
                 response = "How much money do you want to transfer?"
             elif 'PERSON' not in entities and 'receiver_name' not in session_data[name]['context']:
                 session_data[name]['context']['missing'] = 'PERSON'
-                response = "To whom do you want to transfer money?"
                 if 'MONEY' in entities:
                     session_data[name]['context']['amount'] = float(entities['MONEY'].replace('$', '').replace(',', ''))
                 response = "To whom do you want to transfer money?"
 
-
     elif intent == "inform" or intent == "affirm":
         missing_entity = session_data[name]['context'].get('missing')
-        
-        if missing_entity == 'MONEY' and 'MONEY' in entities:
+
+        if session_data[name]['context'].get('step') == 'confirm_transfer' and user_input.lower() in ['yes', 'no']:
+            if user_input.lower() == 'yes':
+                session_data[name]['context']['step'] = 'verify_otp'
+                response = "Please enter the OTP code sent to your registered mobile number."
+            else:
+                session_data[name]['context'] = {}
+                response = "Transfer cancelled."
+        elif session_data[name]['context'].get('step') == 'verify_otp':
+        # Check if user input matches the expected OTP code pattern
+            if user_input.isalnum() and len(user_input) == 6:
+                otp_code = user_input
+                receiver_name = session_data[name]['context'].pop('receiver_name')
+                amount = session_data[name]['context'].pop('amount')
+                response = transfer_money(name, receiver_name, amount, otp_code)
+            else:
+                response = "Please enter the OTP code to proceed with the transfer."
+        elif missing_entity == 'MONEY' and 'MONEY' in entities:
             session_data[name]['context']['missing'] = None
             session_data[name]['context']['amount'] = float(entities['MONEY'].replace('$', '').replace(',', ''))
             if 'receiver_name' in session_data[name]['context']:
                 receiver_name = session_data[name]['context'].pop('receiver_name')
                 amount = session_data[name]['context'].pop('amount')
-                response = transfer_money(name, receiver_name, amount)
+                account_number = transfer_money(name, receiver_name, amount)
+                session_data[name]['context'] = {'amount': amount, 'receiver_name': receiver_name, 'step': 'confirm_transfer'}
+                response = f"Please confirm the transfer to {receiver_name} with account number {account_number}. Type 'yes' to confirm or 'no' to cancel."
             else:
                 response = "To whom do you want to transfer money?"
-                
+
         elif missing_entity == 'PERSON' and 'PERSON' in entities:
             session_data[name]['context']['missing'] = None
             session_data[name]['context']['receiver_name'] = entities['PERSON']
             if 'amount' in session_data[name]['context']:
-                receiver_name = session_data[name]['context'].pop('receiver_name')
-                amount = session_data[name]['context'].pop('amount')
-                response = transfer_money(name, receiver_name, amount)
+                receiver_name = session_data[name]['context']['receiver_name']
+                amount = session_data[name]['context']['amount']
+                account_number = transfer_money(name, receiver_name, amount)
+                session_data[name]['context'] = {'amount': amount, 'receiver_name': receiver_name, 'step': 'confirm_transfer'}
+                response = f"Please confirm the transfer to {receiver_name} with account number {account_number}. Type 'yes' to confirm or 'no' to cancel."
             else:
                 response = "How much money do you want to transfer?"
-                
+
         elif 'PERSON' in entities and 'MONEY' in entities:
             amount = float(entities['MONEY'].replace('$', '').replace(',', ''))
             receiver_name = entities['PERSON']
-            response = transfer_money(name, receiver_name, amount)
-        
+            account_number = transfer_money(name, receiver_name, amount)
+            session_data[name]['context'] = {'amount': amount, 'receiver_name': receiver_name, 'step': 'confirm_transfer'}
+            response = f"Please confirm the transfer to {receiver_name} with account number {account_number}. Type 'yes' to confirm or 'no' to cancel."
+
         elif 'PERSON' in entities and 'amount' in session_data[name]['context']:
             receiver_name = entities['PERSON']
-            amount = session_data[name]['context'].pop('amount')
-            response = transfer_money(name, receiver_name, amount)
-        
+            amount = session_data[name]['context']['amount']
+            account_number = transfer_money(name, receiver_name, amount)
+            session_data[name]['context'] = {'amount': amount, 'receiver_name': receiver_name, 'step': 'confirm_transfer'}
+            response = f"Please confirm the transfer to {receiver_name} with account number {account_number}. Type 'yes' to confirm or 'no' to cancel."
+
         elif 'MONEY' in entities and 'receiver_name' in session_data[name]['context']:
             amount = float(entities['MONEY'].replace('$', '').replace(',', ''))
-            receiver_name = session_data[name]['context'].pop('receiver_name')
-            response = transfer_money(name, receiver_name, amount)
-        
+            receiver_name = session_data[name]['context']['receiver_name']
+            account_number = transfer_money(name, receiver_name, amount)
+            session_data[name]['context'] = {'amount': amount, 'receiver_name': receiver_name, 'step': 'confirm_transfer'}
+            response = f"Please confirm the transfer to {receiver_name} with account number {account_number}. Type 'yes' to confirm or 'no' to cancel."
+
         else:
             response = "Sorry, I don't understand your query."
-
-
     elif intent == "search_transactions":
         sender_surname = session_data.get("PERSON", name)
         if any(keyword in user_input.lower() for keyword in ["last", "latest", "top"]) and "transactions" in user_input.lower():
@@ -488,7 +559,8 @@ def generate_response(user_input, name):
         logging.debug("Default response used.")
 
     logging.debug(f"Final response: {response}")
-    return response
+    response_json = json.dumps({'response': response})
+    return response_json
 
 @app.route('/')
 def home():
