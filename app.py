@@ -1,6 +1,5 @@
 import logging
 from flask import Flask, request, jsonify, render_template, session
-# from chatbot import classify_intent, extract_entities, fetch_customer_balance, transfer_money
 import sqlite3
 import torch
 import pandas as pd
@@ -29,7 +28,6 @@ nlp = spacy.load("en_core_web_sm")
 
 # Load BERT model and tokenizer
 logging.info("Loading BERT model and tokenizer...")
-# model_path = r"C:\Users\Lenovo\Downloads\model_bert_based_\model_bert_based"
 model_path = r"C:\Users\Lenovo\Downloads\MODEL_BERTT-\MODEL_BERTT"
 tokenizer = BertTokenizer.from_pretrained(model_path)
 model = BertForSequenceClassification.from_pretrained(model_path)
